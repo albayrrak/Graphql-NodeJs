@@ -1,9 +1,79 @@
 const data = require('../Data/data.json')
 const { CustomError } = require('../Middleware/CustomError')
+const { nanoid } = require('nanoid')
 
 const { events, locations, users, participants } = data
 
 const resolvers = {
+    Mutation: {
+        // User
+        createUser: (parent, { data }) => {
+            const user = { id: nanoid(), ...data }
+            users.push(user)
+            return user
+        },
+
+        updateUser: (parent, { id, data }) => {
+            const userIndex = users.findIndex(user => user.id === +id)
+            if (userIndex === -1) {
+                throw new Error('User Not Found ')
+            }
+
+
+            users[userIndex].username = data.username
+            users[userIndex].email = data.email
+
+            return users[userIndex]
+
+
+        },
+
+        deleteUser: (parent, { id }) => {
+            let userIndex = users.findIndex(user => user.id === +id)
+            if (userIndex === -1) {
+                throw new Error('User Not Found')
+            }
+
+            let removeUser = users[userIndex]
+            users.splice(userIndex, 1)
+            return removeUser
+
+        },
+
+        // Event
+        createEvent: (parent, { data }) => {
+            const event = { id: nanoid(), ...data, user_id: +data.user_id }
+            events.push(event)
+            return event
+        },
+
+        updateEvent: (parent, { id, data: { title, desc, date, from, to, location_id, user_id } }) => {
+            const eventIndex = events.findIndex(event => event.id === +id)
+            let newEvent = events[eventIndex]
+            newEvent = {
+                title,
+                desc, date, from, to, location_id, user_id
+            }
+            return newEvent
+
+        },
+
+        // Location
+        createLocation: (parent, { data }) => {
+            const location = { id: nanoid(), ...data, lat: parseFloat(data.lat), lng: parseFloat(data.lng) }
+            locations.push(location)
+            return location
+        },
+
+        // Participant
+        createParticipat: (parent, { data }) => {
+            const participant = { id: nanoid(), ...data }
+            participants.push(participant)
+            return participant
+        }
+
+    },
+
     Query: {
         // Events Resolvers
         events: () => events,
