@@ -29,7 +29,7 @@ const resolvers = {
         },
 
         deleteUser: (parent, { id }) => {
-            let userIndex = users.findIndex(user => user.id === +id)
+            const userIndex = users.findIndex(user => user.id === +id)
             if (userIndex === -1) {
                 throw new Error('User Not Found')
             }
@@ -38,6 +38,15 @@ const resolvers = {
             users.splice(userIndex, 1)
             return removeUser
 
+        },
+
+        deleteAllUsers: () => {
+            const length = users.length
+            users.splice(0, length)
+
+            return {
+                count: length
+            }
         },
 
         // Event
@@ -49,12 +58,42 @@ const resolvers = {
 
         updateEvent: (parent, { id, data: { title, desc, date, from, to, location_id, user_id } }) => {
             const eventIndex = events.findIndex(event => event.id === +id)
-            let newEvent = events[eventIndex]
-            newEvent = {
-                title,
-                desc, date, from, to, location_id, user_id
+
+            if (eventIndex === -1) {
+                throw new Error('Event Not Found')
             }
-            return newEvent
+
+            events[eventIndex].title = title
+            events[eventIndex].desc = desc
+            events[eventIndex].date = date
+            events[eventIndex].from = from
+            events[eventIndex].to = to
+            events[eventIndex].location_id = location_id
+            events[eventIndex].user_id = user_id
+
+            return events[eventIndex]
+
+        },
+
+        deleteEvent: (parent, { id }) => {
+            const eventIndex = events.findIndex(event => event.id === +id)
+            if (eventIndex === -1) {
+                throw new Error('Event Not Found')
+            }
+
+            const removeEvent = events[eventIndex]
+            events.splice(eventIndex, 1)
+            return removeEvent
+
+        },
+
+        deleteAllEvents: () => {
+            const length = events.length
+            events.splice(0, length)
+
+            return {
+                count: length
+            }
 
         },
 
@@ -65,11 +104,85 @@ const resolvers = {
             return location
         },
 
+        updateLocation: (parent, { id, data: { name, desc, lat, lng } }) => {
+
+            const locationIndex = locations.findIndex(location => location.id === +id)
+            if (locationIndex === -1) {
+                throw new Error('Location id not found')
+            }
+
+            locations[locationIndex].name = name
+            locations[locationIndex].desc = desc
+            locations[locationIndex].lat = lat
+            locations[locationIndex].lng = lng
+
+            return locations[locationIndex]
+
+
+        },
+
+        deleteLocation: (parent, { id }) => {
+            const locationIndex = locations.findIndex(location => location.id === +id)
+            if (locationIndex === -1) {
+                throw new Error('Not found location')
+            }
+            const removeLocation = locations[locationIndex]
+            locations.splice(locationIndex, 1)
+            return removeLocation
+
+        },
+
+        deleteAllLocations: () => {
+            const length = locations.length
+            locations.splice(0, length)
+
+            return {
+                count: length
+            }
+        },
+
         // Participant
         createParticipat: (parent, { data }) => {
             const participant = { id: nanoid(), ...data }
             participants.push(participant)
             return participant
+        },
+
+        updateParticipant: (parent, { id, data }) => {
+            const participantIndex = participants.findIndex(participant => participant.id === +id)
+
+            if (participantIndex === -1) {
+                throw new Error('Not found Participant')
+            }
+
+            participants[participantIndex].event_id = +data.event_id
+            participants[participantIndex].user_id = +data.user_id
+
+            return participants[participantIndex]
+
+        },
+
+        deleteParticipant: (parent, { id }) => {
+            const participantIndex = participants.findIndex(participant => participant.id === +id)
+
+            if (participantIndex === -1) {
+                throw new Error('Not found participant')
+            }
+
+            const removeParticipant = participants[participantIndex]
+            participants.splice(participantIndex, 1)
+
+            return removeParticipant
+
+        },
+
+        deleteAllParticipants: () => {
+            const length = participants.length
+            participants.splice(0, length)
+
+            return {
+                count: length
+            }
         }
 
     },

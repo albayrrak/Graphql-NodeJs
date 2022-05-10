@@ -53,6 +53,13 @@ const typeDefs = gql`
         lng:Float!
     }
 
+    input UpdateLocation{
+        name:String!
+        desc:String!
+        lat:Float!
+        lng:Float!
+    }
+
 
     # User
     type User{
@@ -72,6 +79,12 @@ const typeDefs = gql`
         email:String!
     }
 
+    type DeleteAllOutput{
+        count:Int!
+    }
+
+   
+
     #Participant
     type Participant{
         id:ID!
@@ -81,6 +94,11 @@ const typeDefs = gql`
     }
 
     input CreateParticipant{
+        user_id:ID!
+        event_id:ID!
+    }
+
+    input UpdateParticipant{
         user_id:ID!
         event_id:ID!
     }
@@ -102,22 +120,32 @@ const typeDefs = gql`
         participants:[Participant!]!
         participant(id:ID!): Participant!
     }
+    
     type Mutation{
         ## User Mutation
         createUser(data: CreateUser!):User!
         updateUser(id:ID!, data:UpdateUser):User!
         deleteUser(id:ID!):User!
+        deleteAllUsers:DeleteAllOutput!
         
         ## Event Mutation
         createEvent(data:CreateEvent!):Event!
         updateEvent(id:ID!, data:updateEvent):Event!
+        deleteEvent(id:ID!):Event!
+        deleteAllEvents:DeleteAllOutput!
 
         
         ## Location Mutation
         createLocation(data:CreateLocation!):Location!
+        updateLocation(id:ID!, data:UpdateLocation!):Location!
+        deleteLocation(id:ID!):Location!
+        deleteAllLocations:DeleteAllOutput!
         
         ## Participant Mutation
         createParticipat(data:CreateParticipant):Participant!
+        updateParticipant(id:ID!, data:UpdateParticipant):Participant!
+        deleteParticipant(id:ID!):Participant!
+        deleteAllParticipants:DeleteAllOutput!
     }
    
 
