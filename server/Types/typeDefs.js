@@ -148,6 +148,10 @@ const typeDefs = gql`
         deleteAllParticipants:DeleteAllOutput!
     }
    
+   type Subscription{
+       userCreated:User!
+       eventCreated:Event!
+   }
 
 `
 

@@ -1,7 +1,9 @@
-const { ApolloServer } = require('apollo-server')
+const { GraphQLServer, PubSub } = require('graphql-yoga')
 const { resolvers } = require('./Resolvers/resolvers.js')
 const { typeDefs } = require('./Types/typeDefs.js')
 
-const app = new ApolloServer({ typeDefs, resolvers })
+const pubsub = new PubSub()
+const server = new GraphQLServer({ typeDefs, resolvers, context: { pubsub } })
 
-app.listen(4000, () => console.log("server  up"))
+server.start(() => console.log("Server iss running"))
+

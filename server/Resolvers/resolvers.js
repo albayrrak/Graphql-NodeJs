@@ -1,15 +1,24 @@
 const data = require('../Data/data.json')
-const { CustomError } = require('../Middleware/CustomError')
 const { nanoid } = require('nanoid')
 
 const { events, locations, users, participants } = data
 
 const resolvers = {
+    Subscription: {
+        userCreated: {
+            subscribe: (parent, args, { pubsub }) => pubsub.asyncIterator('userCreated')
+        },
+        eventCreated: {
+            subscribe: (parent, args, { pubsub }) => pubsub.asyncIterator("eventCreated")
+        }
+    },
+
     Mutation: {
         // User
-        createUser: (parent, { data }) => {
+        createUser: (parent, { data }, { pubsub }) => {
             const user = { id: nanoid(), ...data }
             users.push(user)
+            pubsub.publish('userCreated', { userCreated: user })
             return user
         },
 
@@ -50,9 +59,10 @@ const resolvers = {
         },
 
         // Event
-        createEvent: (parent, { data }) => {
+        createEvent: (parent, { data }, { pubsub }) => {
             const event = { id: nanoid(), ...data, user_id: +data.user_id }
             events.push(event)
+            pubsub.publish('eventCreated', { eventCreated: event })
             return event
         },
 
@@ -194,7 +204,7 @@ const resolvers = {
 
             if (args.id < 1) {
 
-                throw new CustomError('No event found matching this ID')
+                throw new Error('No event found matching this ID')
             }
             const data = events.find(event => event.id === +args.id)
             return data
@@ -206,7 +216,7 @@ const resolvers = {
         location: (_, args) => {
 
             if (args.id < 1) {
-                throw new CustomError('No location found matching this ID')
+                throw new Error('No location found matching this ID')
             }
             const data = locations.find(location => location.id === +args.id)
             return data
@@ -216,7 +226,7 @@ const resolvers = {
         users: () => users,
         user: (_, args) => {
             if (args.id < 1) {
-                throw new CustomError('No user found matching this ID')
+                throw new Error('No user found matching this ID')
             }
             const data = users.find(user => user.id === +args.id)
             return data
@@ -226,7 +236,7 @@ const resolvers = {
         participants: () => participants,
         participant: (_, args) => {
             if (args.id < 1) {
-                throw new CustomError('No participant fount matching this ID')
+                throw new Error('No participant fount matching this ID')
             }
             const data = participants.find(participant => participant.id === +args.id)
             return data
